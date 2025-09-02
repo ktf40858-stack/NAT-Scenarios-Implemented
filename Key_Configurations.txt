@@ -1,0 +1,50 @@
+ Static NAT (Server Publishing)
+
+
+! Web Server NAT Configuration
+ip nat inside source static 192.168.10.10 203.0.113.10
+ip nat inside source static 192.168.10.11 203.0.113.11
+
+! Mail Server NAT Configuration  
+ip nat inside source static tcp 192.168.10.20 25 203.0.113.12 25
+ip nat inside source static tcp 192.168.10.20 110 203.0.113.12 110
+ip nat inside source static tcp 192.168.10.20 143 203.0.113.12 143
+
+Dynamic NAT with PAT (Employee Network)
+
+
+! Employee Network NAT Pool
+ip nat pool EMPLOYEE-POOL 203.0.113.20 203.0.113.30 netmask 255.255.255.240
+
+! ACL for NAT eligibility
+ip access-list standard NAT-ACL
+ permit 192.168.20.0 0.0.0.255
+
+! NAT Configuration with Overload
+ip nat inside source list NAT-ACL pool EMPLOYEE-POOL overload
+
+
+
+
+Port Forwarding (Special Applications)
+
+
+! VPN Port Forwarding
+ip nat inside source static tcp 192.168.20.100 443 203.0.113.15 443
+
+! Remote Desktop Port Forwarding
+ip nat inside source static tcp 192.168.20.50 3389 203.0.113.16 3389
+
+
+
+
+NAT Virtual Interface (Complex Routing)
+
+! NVI Configuration for asymmetric routing scenarios
+interface GigabitEthernet0/0
+ ip nat enable
+!
+interface GigabitEthernet0/1
+ ip nat enable
+!
+ip nat source list NAT-ACL interface GigabitEthernet0/1 overload
